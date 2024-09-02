@@ -21,9 +21,14 @@ Log the worker thread termination and creation in the console.
 - generateNewWorker.js
   - adds variable for tracking idle time
   - adds function for resetting the idle time which terminates the worker on expiration
+  - makes worker a variable so we can inspect an manipulate it as needed
   - adds logging for instances in normal and error cases when worker is terminated
   - adds logging for when new worker threads are created
-  
+- index.js
+  - Uses factory instead of direct object reference to worker generators.
+  - All requests now use the worker factory to get/create a worker thread when called.
+
+
 ### FEATURE0001
 #### Request
 Add correlationId header to all the requests and response

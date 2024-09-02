@@ -3,9 +3,10 @@ const { v4: uuid } = require('uuid');
 const generateNewWorker = require('./utils/generateNewWorker');
 const requestTracker = require('./utils/requestTracker');
 
-const getCatsWorker = generateNewWorker('getCatsWorker');
-const getDogsWorker = generateNewWorker('getDogsWorker');
 
+// Generate worker factories
+const getCatsWorkerFactory = generateNewWorker('getCatsWorker');
+const getDogsWorkerFactory = generateNewWorker('getDogsWorker');
 
 /*
 - PreHandler hook to validate and manage correlationId
@@ -27,11 +28,13 @@ fastify.addHook('preHandler', (request, reply, done) => {
 });
 
 fastify.get('/getCatsInfo', function handler (request, reply) {
+  const getCatsWorker = getCatsWorkerFactory();
   requestTracker[request.correlationId] = (result) => reply.send(result);
   getCatsWorker.postMessage({ requestId: request.correlationId});
 })
 
 fastify.get('/getDogsInfo', function handler (request, reply) {
+  const getDogsWorker = getDogsWorkerFactory();
   requestTracker[request.correlationId] = (result) => reply.send(result);
   getDogsWorker.postMessage({ requestId: request.correlationId });
 })
