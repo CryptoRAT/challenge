@@ -3,6 +3,7 @@ const path = require('path');
 const requestTracker = require('./requestTracker');
 
 const generateNewWorker = (workerName) => {
+  console.log(`Generating new worker ${workerName}`);
   let worker = new Worker(path.join(__dirname, '../workers', workerName));
   let idleTimeoutId;
   // Function to reset idle timeout

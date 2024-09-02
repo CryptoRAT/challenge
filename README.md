@@ -17,6 +17,13 @@ Log the worker thread termination and creation in the console.
 2. Terminate worker threads after 15 minutes.
 3. When a new request arrives check if the worker thread is alive. Create a new one if needed.
 
+#### Changes
+- generateNewWorker.js
+  - adds variable for tracking idle time
+  - adds function for resetting the idle time which terminates the worker on expiration
+  - adds logging for instances in normal and error cases when worker is terminated
+  - adds logging for when new worker threads are created
+  
 ### FEATURE0001
 #### Request
 Add correlationId header to all the requests and response
