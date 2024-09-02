@@ -2,6 +2,7 @@ const { parentPort } = require('worker_threads');
 const mockFetch = require('../utils/mockFetch');
 
 const cachedTokensMap = new Map();
+let refreshTimeoutId;
 
 const refreshToken = async (data) => {
   try {
@@ -20,7 +21,7 @@ const generateToken = async (data) => {
   if (!cachedTokensMap.has(data.key)) {
     const token = await invokeTokenService(data.key);
     cachedTokensMap.set(data.key, { token });
-    setTimeout(() => refreshToken(data), 5000);
+    refreshTimeoutId = setTimeout(() => refreshToken(data), 5000);
     return token;
   } else {
     return cachedTokensMap.get(data.key).token;
@@ -33,10 +34,14 @@ const generateToken = async (data) => {
 */
 const handleMessage = async (data) => {
   console.log('handling request to get cats');
+  if (refreshTimeoutId) {
+    clearTimeout(refreshTimeoutId);
+  }
   const token = await generateToken({
     key: 'token-key'
   });
   const response = await mockFetch('cats', token);
+
   return response;
 }
 /*
@@ -49,5 +54,13 @@ parentPort.on('message', async (message) => {
   } catch (error) {
     console.log('handleResponse error:', error)
     parentPort.postMessage({ response: 'error response from worker1', requestId: message.requestId, });
+  }
+});
+/*
+- clear the timeout to avoid infinite execution
+ */
+parentPort.on('close', () => {
+  if (refreshTimeoutId) {
+    clearTimeout(refreshTimeoutId);
   }
 });
